@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "name": "FISH",
+      "quantity": "2 bags",
+      "category": "proteins",
+      "checked": false
+    },
+    {
+      "name": "egg",
+      "quantity": "dozen",
+      "category": "proteins"
+    },
+    {
+      "name": "lemon",
+      "quantity": "bunch",
+      "category": "fruits"
+    },
+    {
+      "name": "two pillows + pillowcases",
+      "quantity": ")",
+      "category": "ikea",
+      "checked": false
+    },
+    {
+      "name": "duvet + duvet covers",
+      "quantity": "_",
+      "category": "ikea"
+    },
+    {
+      "name": "bedsheet",
+      "quantity": "queen",
+      "category": "ikea",
+      "checked": false
+    },
+    {
+      "name": "pillowcases",
+      "quantity": "4",
+      "category": "ikea"
+    },
+    {
+      "name": "duvet covers",
+      "quantity": "2",
+      "category": "ikea"
+    },
+    {
+      "name": "mop",
+      "quantity": "1",
+      "category": "ikea"
+    }
+  ]
+}

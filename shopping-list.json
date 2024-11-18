@@ -1,52 +1,40 @@
 {
   "items": [
     {
-      "name": "FISH",
-      "quantity": "2 bags",
-      "category": "proteins",
+      "name": "hand soap",
+      "quantity": "1",
+      "category": "other",
       "checked": false
     },
     {
-      "name": "egg",
-      "quantity": "dozen",
-      "category": "proteins"
-    },
-    {
-      "name": "lemon",
-      "quantity": "bunch",
-      "category": "fruits"
-    },
-    {
-      "name": "two pillows + pillowcases",
-      "quantity": ")",
-      "category": "ikea",
+      "name": "tissue box",
+      "quantity": "1",
+      "category": "other",
       "checked": false
     },
     {
-      "name": "duvet + duvet covers",
-      "quantity": "_",
-      "category": "ikea"
-    },
-    {
-      "name": "bedsheet",
-      "quantity": "queen",
-      "category": "ikea",
+      "name": "normal salt",
+      "quantity": "1",
+      "category": "meal_prep",
       "checked": false
-    },
-    {
-      "name": "pillowcases",
-      "quantity": "4",
-      "category": "ikea"
-    },
-    {
-      "name": "duvet covers",
-      "quantity": "2",
-      "category": "ikea"
     },
     {
       "name": "mop",
       "quantity": "1",
-      "category": "ikea"
+      "category": "ikea",
+      "checked": false
+    },
+    {
+      "name": "yeast",
+      "quantity": "1",
+      "category": "healthy_carbs",
+      "checked": false
+    },
+    {
+      "name": "cilantro",
+      "quantity": "1",
+      "category": "vegetables",
+      "checked": false
     }
   ]
 }

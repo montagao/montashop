@@ -178,9 +178,15 @@ bot.onText(/\/list/, async (msg) => {
 const addItemStates = new Map();
 
 // Handle /add command
-bot.onText(/\/add/, async (msg) => {
+bot.onText(/\/add(?:\s+(.+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
-    addItemStates.set(chatId, { state: 'awaiting_name' });
+    const itemName = match[1]?.trim();  // Get the text after /add if it exists
+
+    // Set initial state with name if provided
+    addItemStates.set(chatId, { 
+        state: 'awaiting_name',
+        name: itemName 
+    });
 
     const keyboard = {
         inline_keyboard: Object.entries(categories).map(([cat, emoji]) => ([
@@ -190,7 +196,9 @@ bot.onText(/\/add/, async (msg) => {
 
     await bot.sendMessage(
         chatId,
-        'Select a category for the new item:',
+        itemName 
+            ? `Adding "${itemName}". Select a category:`
+            : 'Select a category for the new item:',
         { reply_markup: keyboard }
     );
 });
@@ -201,14 +209,26 @@ bot.on('callback_query', async (query) => {
     const data = query.data;
 
     if (data.startsWith('category_')) {
-        const category = data.replace('category_', '');
-        addItemStates.set(chatId, {
-            state: 'awaiting_name',
-            category: category
-        });
-        await bot.sendMessage(chatId, 'Enter the item name:');
-        await bot.answerCallbackQuery(query.id);
-    }
+            const category = data.replace('category_', '');
+            const currentState = addItemStates.get(chatId);
+            
+            addItemStates.set(chatId, {
+                state: 'awaiting_name',
+                category: category,
+                name: currentState?.name // Preserve the name if it was set
+            });
+    
+            const state = addItemStates.get(chatId);
+            if (state.name) {
+                // If we already have the name, go straight to quantity
+                state.state = 'awaiting_quantity';
+                addItemStates.set(chatId, state);
+                await bot.sendMessage(chatId, 'Enter the quantity:');
+            } else {
+                await bot.sendMessage(chatId, 'Enter the item name:');
+            }
+            await bot.answerCallbackQuery(query.id);
+        }
 });
 
 // Handle item name and quantity
@@ -218,7 +238,7 @@ bot.on('message', async (msg) => {
 
     if (!state || msg.text?.startsWith('/')) return;
 
-    if (state.state === 'awaiting_name' && state.category) {
+    if (state.state === 'awaiting_name' && state.category && !state.name) {
         state.name = msg.text;
         state.state = 'awaiting_quantity';
         addItemStates.set(chatId, state);
@@ -294,6 +314,26 @@ bot.on('callback_query', async (query) => {
             `✅ Removed from your list:\n${categories[removedItem.category]} ${removedItem.name}`
         );
         await bot.answerCallbackQuery(query.id);
+    } else if (data.startsWith('clear_')) {
+        const shoppingList = await loadShoppingList();
+        let message = '';
+
+        if (data === 'clear_checked') {
+            const originalLength = shoppingList.items.length;
+            shoppingList.items = shoppingList.items.filter(item => !item.checked);
+            const removedCount = originalLength - shoppingList.items.length;
+            message = `🗑️ Cleared ${removedCount} checked item${removedCount !== 1 ? 's' : ''} from your list.`;
+        } else if (data === 'clear_all') {
+            shoppingList.items = [];
+            message = '♻️ Your shopping list has been cleared completely.';
+        }
+
+        await saveShoppingList(shoppingList.items);
+        await bot.sendMessage(chatId, message);
+        await bot.answerCallbackQuery(query.id);
+        
+        // Delete the original "Choose clearing option" message
+        await bot.deleteMessage(chatId, messageId);
     } else if (data.startsWith('toggle_')) {
         const index = parseInt(data.replace('toggle_', ''));
         const shoppingList = await loadShoppingList();
@@ -339,8 +379,16 @@ bot.on('callback_query', async (query) => {
 // Handle /clear command
 bot.onText(/\/clear/, async (msg) => {
     const chatId = msg.chat.id;
-    await saveShoppingList([]);
-    await bot.sendMessage(chatId, '🗑️ Your shopping list has been cleared.');
+    const keyboard = {
+        inline_keyboard: [
+            [{ text: '🗑️ Clear checked items', callback_data: 'clear_checked' }],
+            [{ text: '♻️ Clear all items', callback_data: 'clear_all' }]
+        ]
+    };
+    await safeSendMessage(chatId, '*Choose clearing option:*', { 
+        reply_markup: keyboard,
+        parse_mode: 'Markdown'
+    });
 });
 
 // Error handling
